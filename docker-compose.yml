@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  api-gateway:
+    build:
+      context: ./ApiGateway
+    ports:
+      - "80:3000"
+
+  auth-service:
+    build:
+      context: ./AuthService
+    depends_on:
+      - db-as
+
+  db-as:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: as_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"  # Adjust the port as needed
