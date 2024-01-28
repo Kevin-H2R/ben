@@ -15,6 +15,9 @@ services:
 
   db-as:
     image: postgres:latest
+    build:
+      context: ./AuthService/db
+      dockerfile: db.Dockerfile
     environment:
       POSTGRES_DB: as_db
       POSTGRES_USER: postgres
