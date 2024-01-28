@@ -3,7 +3,7 @@ const pgp = require('pg-promise')()
 
 const app = express()
 const port = 3000
-const db = pgp('postgres://postgres:postgres@db-as:5432/as_db')
+const db = pgp('postgres://postgres:postgres@db-qps:5432/qps_db')
 
 app.use(express.json());
 
