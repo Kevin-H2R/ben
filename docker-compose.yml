@@ -22,5 +22,41 @@ services:
       POSTGRES_DB: as_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"  # Adjust the port as needed
+    # ports:
+    #   - "5432:5432"
+
+  quest-catalog-service:
+    build:
+      context: ./QuestCatalogService
+    depends_on:
+      - db-qcs
+
+  db-qcs:
+    image: postgres:latest
+    build:
+      context: ./QuestCatalogService/db
+      dockerfile: db.Dockerfile
+    environment:
+      POSTGRES_DB: qcs_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # ports:
+    #   - "5432:5432"
+  
+  quest-processing-service:
+    build:
+      context: ./QuestProcessingService
+    depends_on:
+      - db-qps
+
+  db-qps:
+    image: postgres:latest
+    build:
+      context: ./QuestProcessingService/db
+      dockerfile: db.Dockerfile
+    environment:
+      POSTGRES_DB: qps_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # ports:
+    #   - "5432:5432"
