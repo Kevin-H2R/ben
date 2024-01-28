@@ -21,6 +21,23 @@ app.post('/signup', async (req, res) => {
   }
 })
 
+app.post('/signin', async (req, res) => {
+  const {username, password} = req.body
+  const user = await db.one(
+  'SELECT * from users where username = $1', [username])
+  if (!user) {
+    return res.status(401).json({ error: 'Authentication failed' });
+  }
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    return res.status(401).json({ error: 'Authentication failed' });
+  }
+  const token = jwt.sign({ userId: user._id }, 'my-secret', {
+    expiresIn: '1h',
+  });
+  res.status(200).json({ token });
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
