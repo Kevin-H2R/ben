@@ -1,5 +1,8 @@
 version: '3'
-
+# include:
+#   - AuthService/docker-compose.yml
+#   - QuestCatalogService/docker-compose.yml
+#   - QuestProcessingService/docker-compose.yml
 services:
   api-gateway:
     build:
@@ -15,15 +18,17 @@ services:
 
   db-as:
     image: postgres:latest
-    build:
-      context: ./AuthService/db
-      dockerfile: db.Dockerfile
+    # build:
+    #   context: ./AuthService/db
+    #   dockerfile: as-db.Dockerfile
     environment:
       POSTGRES_DB: as_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     # ports:
-    #   - "5432:5432"
+    #   - "5433:5432"
+    volumes:
+      - ./AuthService/db:/docker-entrypoint-initdb.d
 
   quest-catalog-service:
     build:
@@ -33,15 +38,17 @@ services:
 
   db-qcs:
     image: postgres:latest
-    build:
-      context: ./QuestCatalogService/db
-      dockerfile: db.Dockerfile
+    # build:
+    #   context: ./QuestCatalogService/db
+    #   dockerfile: qcs-db.Dockerfile
     environment:
       POSTGRES_DB: qcs_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     # ports:
-    #   - "5432:5432"
+    #   - "5434:5432"
+    volumes:
+      - ./QuestCatalogService/db:/docker-entrypoint-initdb.d
   
   quest-processing-service:
     build:
@@ -51,12 +58,14 @@ services:
 
   db-qps:
     image: postgres:latest
-    build:
-      context: ./QuestProcessingService/db
-      dockerfile: db.Dockerfile
+    # build:
+    #   context: ./QuestProcessingService/db
+    #   dockerfile: qps-db.Dockerfile
     environment:
       POSTGRES_DB: qps_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     # ports:
-    #   - "5432:5432"
+    #   - "5435:5432"
+    volumes:
+      - ./QuestProcessingService/db:/docker-entrypoint-initdb.d

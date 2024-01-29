@@ -1,6 +1,7 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
+const { default: axios } = require('axios');
 const pgp = require('pg-promise')()
 require('dotenv').config()
 
@@ -14,9 +15,17 @@ app.post('/signup', async (req, res) => {
   try {
     const { email, username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.one(
-      'INSERT INTO users (email, username, password) VALUES ($1, $2, $3)', [email, username, hashedPassword])
-    res.json("good")
+    const data = await db.one(
+      'INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING id',
+      [email, username, hashedPassword])
+    await axios.post(
+      `http://${process.env.QUEST_PROCESSING_SERVICE_NAME}:${process.env.QUEST_PROCESSING_SERVICE_PORT}/user-signed-up`,
+      {user_id: data.id},
+      {
+        headers: {'Content-Type': 'application/json'}
+      }
+    )
+    res.json("Noice")
   } catch (e) {
     res.json(e.message)
   }
