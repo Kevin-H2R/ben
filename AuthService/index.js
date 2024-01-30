@@ -45,7 +45,7 @@ app.post('/signin', async (req, res) => {
   });
   axios.post(
     `http://${process.env.QUEST_PROCESSING_SERVICE_ENDPOINT}/user-signed-in`,
-    {user_id: data.id},
+    {user_id: user.id},
     {headers: {'Content-Type': 'application/json'}}
   )
   res.status(200).json({ token });
