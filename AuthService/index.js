@@ -14,6 +14,14 @@ app.use(express.json());
 app.post('/signup', async (req, res) => {
   try {
     const { email, username, password } = req.body;
+    const existingUser = await db.oneOrNone(
+      'SELECT id from users where email = $1 or username = $2', 
+      [email, username]
+    )
+    if (existingUser) {
+      res.status(401).json('User already exists')
+      return
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const data = await db.one(
       'INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING id',
@@ -23,9 +31,9 @@ app.post('/signup', async (req, res) => {
       {user_id: data.id},
       {headers: {'Content-Type': 'application/json'}}
     )
-    res.json("Noice")
+    res.json()
   } catch (e) {
-    res.json(e.message)
+    res.status(500).json(e.message)
   }
 })
 

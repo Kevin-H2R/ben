@@ -17,20 +17,23 @@ app.post('/api/signup', async (req, res) => {
     )
     res.json(response.data)
   } catch (e) {
-    console.log(e)
-    res.status(500).json(e)
+    res.status(e.response.status).json(e.response.data)
   }
 })
 
 app.post('/api/signin', async (req, res) => {
-  const response = await axios.post(
-    `http://${process.env.AUTH_SERVICE_NAME}:${process.env.AUTH_SERVICE_PORT}/signin`,
-    req,
-    {
-      headers: {'Content-Type': 'application/json'}
-    }
-  )
-  res.json(response.data)
+  try {
+    const response = await axios.post(
+      `http://${process.env.AUTH_SERVICE_NAME}:${process.env.AUTH_SERVICE_PORT}/signin`,
+      req,
+      {
+        headers: {'Content-Type': 'application/json'}
+      }
+    )
+    res.json(response.data)
+  } catch (e) {
+    res.status(e.response.status).json(e.response.data)
+  }
 })
 
 app.get('', (req, res) => {
