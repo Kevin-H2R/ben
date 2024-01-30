@@ -56,7 +56,6 @@ app.post('/signin', async (req, res) => {
     {user_id: user.id},
     {headers: {'Content-Type': 'application/json'}}
   )
-  console.log(response.data)
   res.status(200).json({ token });
 })
 

@@ -35,6 +35,7 @@ services:
       context: ./QuestCatalogService
     depends_on:
       - db-qcs
+      - redis
 
   db-qcs:
     image: postgres:latest
@@ -49,6 +50,12 @@ services:
     #   - "5434:5432"
     volumes:
       - ./QuestCatalogService/db:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379" 
+    command: redis-server
   
   quest-processing-service:
     build:
