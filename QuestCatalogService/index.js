@@ -10,7 +10,6 @@ app.use(express.json());
 app.post('/quest-detail', async (req, res) => {
   try {
     const {name} = req.body
-    console.log("name of the quest: " + name)
     const quest = await db.one('SELECT * FROM quests where name = $1', [name])
     res.json(quest)
   } catch (e) {

@@ -43,11 +43,12 @@ app.post('/signin', async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.APP_SECRET, {
     expiresIn: '1h',
   });
-  axios.post(
+  const response = axios.post(
     `http://${process.env.QUEST_PROCESSING_SERVICE_ENDPOINT}/user-signed-in`,
     {user_id: user.id},
     {headers: {'Content-Type': 'application/json'}}
   )
+  console.log(response.data)
   res.status(200).json({ token });
 })
 

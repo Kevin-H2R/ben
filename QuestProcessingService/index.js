@@ -6,6 +6,7 @@ require('dotenv').config()
 const app = express()
 const port = 3000
 const db = pgp('postgres://postgres:postgres@db-qps:5432/qps_db')
+const dbUtils = require('./utils/database')
 
 app.use(express.json());
 
@@ -19,13 +20,10 @@ app.post('/user-signed-up', async (req, res) => {
       {name: 'Sign in 3 times'},
       {headers: {'Content-Type': 'application/json'}}
     )
-    await db.none(
-      "INSERT INTO user_quest (user_id, quest_id, status) VALUES ($1, $2, 'not_claimed')",
-      [user_id, response.data.id]
-     )
+    await dbUtils.insertUserQuest(db, user_id, response.data.id)
     res.json("Quest Processing Service")
   } catch (e) {
-    res.json(e.message)
+    res.status(500).json(e.message)
   }
 })
 
@@ -40,42 +38,29 @@ app.post('/user-signed-in', async (req, res) => {
       {headers: {'Content-Type': 'application/json'}}
     )
     // Grabing the on going user_quest for that user, grabing also the progress count in the same query
-    const user_quest = await db.oneOrNone(
-      "SELECT user_quest.id, COUNT(progress.id) FROM user_quest LEFT JOIN progress on progress.user_quest_id = user_quest.id WHERE user_id = $1 AND quest_id = $2 AND user_quest.date IS NULL GROUP BY user_quest.id",
-      [user_id, questResponse.data.id]
-    )
+    const user_quest = await dbUtils.selectOnGoingQuest(db, user_id, questResponse.data.id)
     // Sign in 3 times quest is not going on
     if (!user_quest) {
       res.json()
       return
     }
-    await db.none(
-      "INSERT INTO progress (user_quest_id, date) VALUES ($1, NOW())",
-      [user_quest.id]
-     )
+    await dbUtils.insertProgress(db, user_quest.id)
     // Finished one cycle
     if (parseInt(user_quest.count) === questResponse.data.streak - 1) {
       // Gotta check how many user_quests are done and if its bellow quest
       // duplication count. Gotta create a new user_quest if it is.
-      await db.none("UPDATE user_quest SET date = NOW() where id = $1", [user_quest.id])
-      const done_quest = await db.manyOrNone(
-        "SELECT id  FROM user_quest WHERE user_id = $1 AND quest_id = $2 AND user_quest.date IS NOT NULL",
-        [user_id, questResponse.data.id])
-        console.log(typeof done_quest.length, typeof questResponse.data.duplication)
-        console.log(done_quest.length, questResponse.data.duplication)
+      await dbUtils.finishQuest(db, user_quest.id)
+      const done_quest = await dbUtils.selectDoneQuests(db, user_id, questResponse.data.id)
       if (done_quest.length >= questResponse.data.duplication) {
         res.json()
         return
       }
-      await db.none(
-        "INSERT INTO user_quest (user_id, quest_id, status) VALUES ($1, $2, 'not_claimed')",
-        [user_id, questResponse.data.id]
-       )
+      await dbUtils.insertUserQuest(db, user_id, questResponse.data.id)
     }
     res.json("Quest Processing Service")
   } catch (e) {
     console.log(e)
-    res.json(e.message)
+    res.status(500).json(e.message)
   }
 })
 
