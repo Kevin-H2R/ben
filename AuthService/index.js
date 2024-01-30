@@ -39,14 +39,14 @@ app.post('/signup', async (req, res) => {
 
 app.post('/signin', async (req, res) => {
   const {username, password} = req.body
-  const user = await db.one(
+  const user = await db.oneOrNone(
   'SELECT * from users where username = $1', [username])
   if (!user) {
     return res.status(401).json({ error: 'Authentication failed' });
   }
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    return res.status(401).json({ error: 'Authentication failed' });
+    return res.status(401).json('Authentication failed');
   }
   const token = jwt.sign({ userId: user._id }, process.env.APP_SECRET, {
     expiresIn: '1h',
