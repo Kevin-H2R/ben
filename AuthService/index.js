@@ -18,12 +18,10 @@ app.post('/signup', async (req, res) => {
     const data = await db.one(
       'INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING id',
       [email, username, hashedPassword])
-    await axios.post(
-      `http://${process.env.QUEST_PROCESSING_SERVICE_NAME}:${process.env.QUEST_PROCESSING_SERVICE_PORT}/user-signed-up`,
+    axios.post(
+      `http://${process.env.QUEST_PROCESSING_SERVICE_ENDPOINT}/user-signed-up`,
       {user_id: data.id},
-      {
-        headers: {'Content-Type': 'application/json'}
-      }
+      {headers: {'Content-Type': 'application/json'}}
     )
     res.json("Noice")
   } catch (e) {
@@ -45,6 +43,11 @@ app.post('/signin', async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.APP_SECRET, {
     expiresIn: '1h',
   });
+  axios.post(
+    `http://${process.env.QUEST_PROCESSING_SERVICE_ENDPOINT}/user-signed-in`,
+    {user_id: data.id},
+    {headers: {'Content-Type': 'application/json'}}
+  )
   res.status(200).json({ token });
 })
 
