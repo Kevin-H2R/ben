@@ -59,6 +59,18 @@ app.post('/signin', async (req, res) => {
   res.status(200).json({ token });
 })
 
+app.get('/users/:username', async (req, res) => {
+  const username = req.params.username
+  const id = await db.oneOrNone(
+    "SELECT id from users where username = $1", [username]
+  )
+  if (!id) {
+    res.status(404).json("User not found")
+    return
+  }
+  res.json(id)
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

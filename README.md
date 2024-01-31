@@ -1,5 +1,25 @@
 # Kevin's 2nd round interview project @BEN Inc
 
+## How to use
+- `docker compose up --build` at the root of the project
+- Two endpoints to play with:
+  - POST localhost/api/signup: requires a JSON body like
+  ```
+    {
+      "email": "toto1@test.com",
+      "username": "toto1",
+      "password": "toto"
+    }
+  ```
+
+  - POST localhost/api/signin: requires a JSON body like
+  ```
+    {
+      "username": "toto1",
+      "password": "toto"
+    }
+  ```
+
 ## Context
 We are building an english learn plateform with a gamification system that rewards (gold/diamond/...) users when they perfom given actions. Those given actions are called **quests**.
 A user may have to perform the quest multiple times to get the reward. And, depending on the quest, a user may perform the whole quest multiple times.
@@ -22,12 +42,22 @@ Create a "signup" endpoint (*K: I will expect that I need to create the signin e
 
 ## How I am thinking of doing it
 
-![The architecture I am thinking about to solve that problem](./archi.png?raw=true "Archi")
+### Signup
+![The design for signup process I am thinking about to solve that problem](./signupProcess.jpg?raw=true "Archi")
+
+### Signin
+![The design for signin process I am thinking about to solve that problem](./signinProcess.jpg?raw=true "Archi")
 
 When a user signs up, we create a row in **User_Quest** table, linking the new user to the 'si3t' quest.\
 Everytime a user signs in we check if there are rows related to the user in the **User_Quest** table that has a null **date** property (this represents the on-going quest).\
 If the 'si3t' quest is on going for the current user, we add a progress row for that quest, and we check wether he completed the quest or not (if there is 3 progress rows for that **User_Quest**).\
 If they completed the quest, we add the date to the **User_Quest** row and we check how many times the user completed that quest, if that number is below **duplication**, we create a new **User_Quest** row for that user.
 
-<!-- This is out of the scope I guess, but I think it would be a good idea to add a table **Quest Tree**, that would hold a OneToMany relationship between a quest A and 1 to n B quests, this would represent the fact that when we finish quest A, we unlock the B quest(s).\ -->
-
+## Feedback on the project
+I decided to go for an event-based microservice architecture with the API gateway acting as the event dispatcher. I feel there would have been a better way to handle events, like with an other event dispatcher service in the middle.\
+I also went very basic for database request, did not use an ORM (I would have used Sequelize here as I made node app for the services).\
+I feel that my cache usage is to 'too simple', maybe there is a more efficient way to use cache here.\
+I changed a bit the database architecture that I was given, I hope it is ok.\
+\
+Overall I really enjoyed doing this mini-project, it was really fun and interesting to come up with an architecture like that.\
+I wish I knew more about Kubernetes, I went with `docker compose` as I was more comfortable with it, but I know K8s offers interesting features, especially for scaling (that I skipped).
