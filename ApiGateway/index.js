@@ -4,16 +4,15 @@ const app = express()
 const port = 3000
 require('dotenv').config()
 
-// `http://${process.env.AUTH_SERVICE_NAME}:${process.env.AUTH_SERVICE_PORT}/`
 
+// Signup endpoint
 app.post('/api/signup', async (req, res) => {
   try {
+    // Reroute to Auth service
     const response = await axios.post(
       `http://${process.env.AUTH_SERVICE_ENDPOINT}/signup`,
       req,
-      {
-        headers: {'Content-Type': 'application/json'}
-      }
+      {headers: {'Content-Type': 'application/json'}}
     )
     res.json(response.data)
   } catch (e) {
@@ -22,8 +21,10 @@ app.post('/api/signup', async (req, res) => {
   }
 })
 
+// Signin endpoint
 app.post('/api/signin', async (req, res) => {
   try {
+    // Reroute to Auth service
     const response = await axios.post(
       `http://${process.env.AUTH_SERVICE_ENDPOINT}/signin`,
       req,
@@ -35,6 +36,8 @@ app.post('/api/signin', async (req, res) => {
   }
 })
 
+// Endpoint to check on-going quests.
+// Made it for easy debug
 app.get('/api/user/:username/quests/on-going', async (req, res) => {
   try {
     const username = req.params.username
@@ -56,6 +59,8 @@ app.get('/api/user/:username/quests/on-going', async (req, res) => {
   }
 })
 
+// Endpoint to check done quests.
+// Made it for easy debug
 app.get('/api/user/:username/quests/done', async (req, res) => {
   try {
     const username = req.params.username
