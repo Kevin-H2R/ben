@@ -80,6 +80,22 @@ app.post('/on-going', async(req, res) => {
   res.json(user_quest)
 })
 
+app.post('/done', async(req, res) => {
+  const {user_id} = req.body
+  const questResponse = await axios.post(
+    `http://${process.env.QUEST_CATALOG_SERVICE_ENDPOINT}/quest-detail`,
+    {name: 'Sign in 3 times'},
+    {headers: {'Content-Type': 'application/json'}}
+  )
+  const user_quest = await dbUtils.selectDoneQuests(db, user_id, questResponse.data.id)
+  if (!user_quest) {
+    res.json([])
+    return
+  }
+  res.json(user_quest)
+})
+
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

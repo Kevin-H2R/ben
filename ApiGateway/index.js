@@ -56,6 +56,27 @@ app.get('/api/user/:username/quests/on-going', async (req, res) => {
   }
 })
 
+app.get('/api/user/:username/quests/done', async (req, res) => {
+  try {
+    const username = req.params.username
+    const userResponse = await axios.get(
+      `http://${process.env.AUTH_SERVICE_ENDPOINT}/users/${username}`
+    )
+    const questResponse = await axios.post(
+      `http://${process.env.QUEST_PROCESSING_SERVICE_ENDPOINT}/done`,
+      {user_id: userResponse.data.id},
+      {headers: {'Content-Type': 'application/json'}}
+    )
+    if (!questResponse.data) {
+      res.json("No done quest")
+      return
+    }
+    res.json(`${questResponse.data.length} done quest(s)`)
+  } catch (e) {
+    res.status(e.response.status).json(e.response.data)
+  }
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
