@@ -2,8 +2,8 @@
 
 ## How to use
 - `docker compose up --build` at the root of the project
-- Two endpoints to play with:
-  - POST localhost/api/signup: requires a JSON body like
+- Two main endpoints to play with:
+  - POST `localhost/api/signup` requires a JSON body like:
   ```
     {
       "email": "toto1@test.com",
@@ -12,13 +12,18 @@
     }
   ```
 
-  - POST localhost/api/signin: requires a JSON body like
+  - POST `localhost/api/signin` requires a JSON body like:
   ```
     {
       "username": "toto1",
       "password": "toto"
     }
   ```
+- Also added two endpoints to check the data directly:
+  - GET `localhost/api/user/:username/quests/on-going`, replace `:username` with your username. Checks the on-going quests for the user
+  - GET `localhost/api/user/:username/quests/done`, replace `:username` with your username. Checks the done quests for the user
+- Or you can exec in the different database containers directly to query the data you want.
+- `docker compose down --volumes` to empty all the databases and restart fresh.
 
 ## Context
 We are building an english learn plateform with a gamification system that rewards (gold/diamond/...) users when they perfom given actions. Those given actions are called **quests**.
